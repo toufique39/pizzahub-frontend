@@ -13,6 +13,7 @@ import {
   signUpSchema,
   type SignUpFormValues,
 } from "../schemas/sign-up.schema";
+import { useState } from "react";
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function SignUpForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -32,7 +34,33 @@ export default function SignUpForm() {
       role: "customer",
     },
   });
+const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
+const selectedRole = watch("role");
+
+const handleGoogleSignUp = async () => {
+  try {
+    setIsGoogleLoading(true);
+
+    const { error } = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+      additionalData: {
+        role: selectedRole,
+      },
+    });
+
+    if (error) {
+      toast.error(error.message || "Google registration failed.");
+      setIsGoogleLoading(false);
+    }
+  } catch (error) {
+    console.error("Google signup error:", error);
+
+    toast.error("Unable to sign up with Google.");
+    setIsGoogleLoading(false);
+  }
+};
   const onSubmit = async (values: SignUpFormValues) => {
     try {
       const { error } = await authClient.signUp.email({
@@ -184,6 +212,24 @@ export default function SignUpForm() {
       >
         {isSubmitting ? "Creating Account..." : "Create Account"}
       </Button>
+      <div className="relative flex items-center py-2">
+  <div className="flex-1 border-t" />
+  <span className="px-3 text-xs text-muted-foreground">
+    OR CONTINUE WITH
+  </span>
+  <div className="flex-1 border-t" />
+</div>
+
+<Button
+  type="button"
+  variant="outline"
+  className="w-full"
+  disabled={isGoogleLoading || isSubmitting}
+  onClick={handleGoogleSignUp}
+>
+  <span className="font-bold text-blue-600">G</span>
+  {isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}
+</Button>
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}

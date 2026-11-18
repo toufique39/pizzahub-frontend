@@ -1,9 +1,9 @@
-import { betterAuth, APIError } from "better-auth";
+import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { jwt } from "better-auth/plugins";
-
+import {APIError,createAuthMiddleware,getOAuthState,} from "better-auth/api";
 import { client, db } from "./mongodb";
-import { createAuthMiddleware } from "better-auth/api";
+
 
 const baseURL =
   process.env.BETTER_AUTH_URL || "http://localhost:10000";
@@ -80,26 +80,37 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user) => {
-          const role =
-            typeof user.role === "string" ? user.role : "customer";
+        before: async (user, ctx) => {
+  let requestedRole =
+    typeof user.role === "string" ? user.role : "customer";
 
-          if (!["customer", "vendor"].includes(role)) {
-            throw new APIError("BAD_REQUEST", {
-              message:
-                "Only Customer and Vendor accounts can register publicly.",
-            });
-          }
+  // Read selected role from Google OAuth state
+  if (ctx?.path === "/callback/:id") {
+    const oauthData = await getOAuthState<{
+      role?: string;
+    }>();
 
-          return {
-            data: {
-              ...user,
-              role,
-              isBlocked: false,
-              subscriptionPlan: "free",
-            },
-          };
-        },
+    if (typeof oauthData?.role === "string") {
+      requestedRole = oauthData.role;
+    }
+  }
+
+  // Never allow public admin registration
+  if (!["customer", "vendor"].includes(requestedRole)) {
+    throw new APIError("BAD_REQUEST", {
+      message: "Invalid account role.",
+    });
+  }
+
+  return {
+    data: {
+      ...user,
+      role: requestedRole,
+      isBlocked: false,
+      subscriptionPlan: "free",
+    },
+  };
+},
       },
 
       // Prevent users from changing their own role
