@@ -3,6 +3,7 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { jwt } from "better-auth/plugins";
 
 import { client, db } from "./mongodb";
+import { createAuthMiddleware } from "better-auth/api";
 
 const baseURL =
   process.env.BETTER_AUTH_URL || "http://localhost:10000";
@@ -22,6 +23,8 @@ export const auth = betterAuth({
   // Email and Password Authentication
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 6,
+  maxPasswordLength: 128,
   },
 
   // Google OAuth
@@ -118,7 +121,39 @@ export const auth = betterAuth({
       },
     },
   },
+hooks: {
+  before: createAuthMiddleware(async (ctx) => {
+    if (ctx.path !== "/sign-up/email") {
+      return;
+    }
 
+    const password = ctx.body?.password;
+    const role = ctx.body?.role;
+
+    // Password validation
+    if (
+      typeof password !== "string" ||
+      password.length < 6 ||
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password)
+    ) {
+      throw new APIError("BAD_REQUEST", {
+        message:
+          "Password must contain at least 6 characters, one uppercase and one lowercase letter.",
+      });
+    }
+
+    // Public registration role validation
+    if (
+      role !== undefined &&
+      !["customer", "vendor"].includes(role)
+    ) {
+      throw new APIError("BAD_REQUEST", {
+        message: "Invalid account role.",
+      });
+    }
+  }),
+},
   // JWT Plugin
   plugins: [
     jwt({

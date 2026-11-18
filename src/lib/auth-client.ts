@@ -1,9 +1,14 @@
 import { createAuthClient } from "better-auth/react";
-import { jwtClient } from "better-auth/client/plugins";
+import { inferAdditionalFields, jwtClient } from "better-auth/client/plugins";
+import { auth } from "./auth";
 
 export const authClient = createAuthClient({
-  plugins: [jwtClient()]
+  plugins: [
+    inferAdditionalFields<typeof auth>(),
+    jwtClient(),
+  ],
 });
+
 
 export const {
   signIn,

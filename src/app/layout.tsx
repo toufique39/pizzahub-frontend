@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-
+import { Toaster } from "@/components/ui/sonner";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { AppProviders } from "@/providers/app-providers";
@@ -35,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AppProviders>
           <SiteHeader />
           <main className="flex flex-1 flex-col">{children}</main>
+          <Toaster richColors position="top-right" />
           <SiteFooter />
         </AppProviders>
       </body>
