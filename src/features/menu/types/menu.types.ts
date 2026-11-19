@@ -1,5 +1,6 @@
 export interface MenuItem {
   _id: string;
+  vendorId: string;
   itemName: string;
   category: string;
   description: string;

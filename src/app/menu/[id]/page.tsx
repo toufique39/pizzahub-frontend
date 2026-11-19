@@ -1,16 +1,42 @@
-import type { Metadata } from "next";
-import { PagePlaceholder } from "@/components/common/page-placeholder";
+import { headers } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Menu item",
-};
+import { auth } from "@/lib/auth";
+import MenuItemDetails from "@/features/menu/components/menu-item-details";
 
-export default function MenuItemPage() {
-  // TODO: read `params.id` (via PageProps<"/menu/[id]">) once the detail view exists.
+export const instant = false;
+
+interface MenuDetailsPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+export default async function MenuDetailsPage({
+  params,
+}: MenuDetailsPageProps) {
+  const { id } = await params;
+
+  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+    notFound();
+  }
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
+  if (session.user.isBlocked) {
+    redirect("/account-blocked");
+  }
+
   return (
-    <PagePlaceholder
-      title="Menu item"
-      description="Item details, options, and the add-to-cart action will live in features/menu."
+    <MenuItemDetails
+      itemId={id}
+      userRole={session.user.role || "customer"}
     />
   );
 }
