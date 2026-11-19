@@ -25,7 +25,7 @@ export default function AuthCallbackPage() {
   }, [session, isPending, error, router]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#fff8f2]">
+    <main className="flex min-h-dvh items-center justify-center bg-[#fff8f2] px-4">
       <div className="text-center">
         <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-orange-200 border-t-orange-600" />
 

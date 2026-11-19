@@ -93,6 +93,7 @@ export default function SignInForm() {
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
+            className="h-10"
             {...register("email")}
           />
 
@@ -113,6 +114,7 @@ export default function SignInForm() {
             type="password"
             placeholder="Enter your password"
             autoComplete="current-password"
+            className="h-10"
             {...register("password")}
           />
 
@@ -126,7 +128,7 @@ export default function SignInForm() {
         <Button
           type="submit"
           disabled={isSubmitting || isGoogleLoading}
-          className="w-full bg-orange-600 text-white hover:bg-orange-700"
+          className="h-11 w-full bg-orange-600 text-white hover:bg-orange-700"
         >
           {isSubmitting ? "Signing In..." : "Sign In"}
         </Button>
@@ -146,7 +148,7 @@ export default function SignInForm() {
       <Button
         type="button"
         variant="outline"
-        className="w-full"
+        className="h-11 w-full"
         disabled={isGoogleLoading || isSubmitting}
         onClick={handleGoogleSignIn}
       >

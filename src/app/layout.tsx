@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
 import { AppProviders } from "@/providers/app-providers";
 
 import "./globals.css";
+import SiteShell from "@/components/layout/site-shell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,12 +31,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col overflow-x-hidden">
         <AppProviders>
-          <SiteHeader />
-          <main className="flex flex-1 flex-col">{children}</main>
+          <Suspense fallback={<div className="min-h-dvh" />}>
+            <SiteShell>{children}</SiteShell>
+          </Suspense>
           <Toaster richColors position="top-right" />
-          <SiteFooter />
         </AppProviders>
       </body>
     </html>

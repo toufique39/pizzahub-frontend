@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function AccountBlockedPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-orange-50 px-4">
-      <div className="max-w-md rounded-2xl bg-white p-8 text-center shadow-lg">
-        <h1 className="text-3xl font-bold text-red-600">
+    <main className="flex flex-1 items-center justify-center bg-orange-50 px-4 py-12 sm:px-6">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-lg sm:p-8">
+        <h1 className="text-2xl font-bold text-red-600 sm:text-3xl">
           Account Blocked
         </h1>
 
