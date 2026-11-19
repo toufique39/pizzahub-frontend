@@ -1,10 +1,11 @@
+import CustomerDashboard from "@/features/customers/components/customer-dashboard";
+
 export default function CustomerDashboardPage() {
   return (
-    <main className="w-full flex-1 p-4 sm:p-6 lg:p-8">
-      <h1 className="text-xl font-bold text-foreground sm:text-2xl">
-        Customer Dashboard
-      </h1>
-      <p className="mt-2 text-sm text-muted-foreground">Coming Soon</p>
+    <main className="min-h-screen bg-[#fffaf3] px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <CustomerDashboard />
+      </div>
     </main>
   );
 }
