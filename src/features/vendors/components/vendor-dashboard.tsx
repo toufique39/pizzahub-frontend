@@ -10,6 +10,7 @@ import {
   Crown,
   Loader2,
   Pizza,
+  Plus,
   RefreshCw,
   ShoppingBag,
   XCircle,
@@ -112,11 +113,7 @@ function formatDate(value?: string) {
   });
 }
 
-function getImageUrl(images?: VendorOrder["item"] extends infer T
-  ? T extends { images?: infer I }
-    ? I
-    : never
-  : never) {
+function getImageUrl(images?: (string | { url?: string })[]) {
   if (!Array.isArray(images) || !images[0]) return "";
 
   const image = images[0];
@@ -146,9 +143,6 @@ export default function VendorDashboard() {
 
   const loadDashboard = useCallback(async () => {
     try {
-      setLoading(true);
-      setError("");
-
       const [summaryResponse, ordersResponse] = await Promise.all([
         apiFetch<SummaryResponse>("/api/vendor/dashboard/summary"),
         apiFetch<OrdersResponse>("/api/vendor/orders"),
@@ -156,6 +150,7 @@ export default function VendorDashboard() {
 
       setSummary(summaryResponse.data);
       setOrders(ordersResponse.data || []);
+      setError("");
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Unable to load dashboard.";
@@ -165,6 +160,11 @@ export default function VendorDashboard() {
       setLoading(false);
     }
   }, []);
+
+  const refreshDashboard = () => {
+    setLoading(true);
+    loadDashboard();
+  };
 
   useEffect(() => {
     loadDashboard();
@@ -215,7 +215,7 @@ export default function VendorDashboard() {
     return (
       <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
         <p className="text-sm text-red-700">{error}</p>
-        <Button onClick={loadDashboard} className="mt-4">
+        <Button onClick={refreshDashboard} className="mt-4">
           <RefreshCw className="mr-2 h-4 w-4" />
           Try Again
         </Button>
@@ -226,7 +226,7 @@ export default function VendorDashboard() {
   return (
     <div className="space-y-8">
       {/* Page heading */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-medium text-orange-600">
             Vendor Dashboard
@@ -239,14 +239,38 @@ export default function VendorDashboard() {
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          onClick={loadDashboard}
-          disabled={loading}
-        >
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Refresh
-        </Button>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+          <Button
+            render={<Link href="/vendor/dashboard/add-menu-item" />}
+            nativeButton={false}
+            className="w-full bg-orange-600 hover:bg-orange-700 sm:w-auto"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Menu Item
+          </Button>
+
+          <Button
+            render={<Link href="/vendor/dashboard/menu-items" />}
+            nativeButton={false}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            <Pizza className="mr-2 h-4 w-4" />
+            My Menu Items
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={refreshDashboard}
+            disabled={loading}
+            className="w-full sm:w-auto"
+          >
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Statistics */}
@@ -298,11 +322,15 @@ export default function VendorDashboard() {
           </div>
         </div>
 
-        <Button asChild className="bg-orange-600 hover:bg-orange-700">
-          <Link href="/vendor/dashboard/subscription">
-            <Crown className="mr-2 h-4 w-4" />
-            Upgrade to Premium
-          </Link>
+        <Button
+          render={<Link href="/vendor/dashboard/subscription" />}
+          nativeButton={false}
+          className="w-full bg-orange-600 hover:bg-orange-700 sm:w-auto"
+        >
+          <Crown className="mr-2 h-4 w-4" />
+          {summary?.subscriptionPlan === "premium"
+            ? "Manage Subscription"
+            : "Upgrade to Premium"}
         </Button>
       </div>
 
@@ -325,14 +353,14 @@ export default function VendorDashboard() {
         </div>
 
         {/* Filter */}
-        <div className="flex flex-wrap gap-2">
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
           {["all", "pending", "accepted", "rejected", "cancelled"].map(
             (status) => (
               <button
                 key={status}
                 type="button"
                 onClick={() => setStatusFilter(status)}
-                className={`rounded-full px-4 py-2 text-sm font-medium capitalize transition ${
+                className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium capitalize transition ${
                   statusFilter === status
                     ? "bg-orange-600 text-white"
                     : "border border-gray-200 bg-white text-gray-600 hover:border-orange-300"
@@ -369,21 +397,21 @@ export default function VendorDashboard() {
                   className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
                 >
                   <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="flex gap-4">
+                    <div className="flex min-w-0 gap-4">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
                           alt={order.item?.itemName || order.itemName || "Pizza"}
-                          className="h-20 w-20 rounded-xl object-cover"
+                          className="h-20 w-20 shrink-0 rounded-xl object-cover"
                         />
                       ) : (
-                        <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-orange-50">
+                        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-orange-50">
                           <Pizza className="h-8 w-8 text-orange-500" />
                         </div>
                       )}
 
                       <div className="min-w-0">
-                        <h3 className="font-bold text-gray-900">
+                        <h3 className="break-words font-bold text-gray-900">
                           {order.item?.itemName || order.itemName || "Menu Item"}
                         </h3>
 
@@ -408,10 +436,10 @@ export default function VendorDashboard() {
                         <p className="text-xs font-medium uppercase text-gray-400">
                           Customer
                         </p>
-                        <p className="mt-1 text-sm font-semibold text-gray-800">
+                        <p className="mt-1 truncate text-sm font-semibold text-gray-800">
                           {order.customer?.name || "Customer"}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="break-all text-sm text-gray-500">
                           {order.customer?.email || ""}
                         </p>
                       </div>
@@ -459,7 +487,7 @@ export default function VendorDashboard() {
                   </div>
 
                   {order.status === "pending" && (
-                    <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-100 pt-4">
+                    <div className="mt-5 grid grid-cols-2 gap-3 border-t border-gray-100 pt-4 sm:flex sm:justify-end">
                       <Button
                         variant="outline"
                         className="border-red-200 text-red-600 hover:bg-red-50"

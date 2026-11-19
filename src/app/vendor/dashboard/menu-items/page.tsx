@@ -1,16 +1,5 @@
-import type { Metadata } from "next";
+import MyMenuItems from "@/features/vendors/components/my-menu-items";
 
-import { PagePlaceholder } from "@/components/common/page-placeholder";
-
-export const metadata: Metadata = {
-  title: "Menu items",
-};
-
-export default function VendorMenuItemsPage() {
-  return (
-    <PagePlaceholder
-      title="Menu items"
-      description="Manage availability, pricing, and categories for this vendor's menu."
-    />
-  );
+export default function MyMenuItemsPage() {
+  return <MyMenuItems />;
 }

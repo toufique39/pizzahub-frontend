@@ -111,9 +111,6 @@ export default function CustomerDashboard() {
 
   const loadDashboard = useCallback(async () => {
     try {
-      setLoading(true);
-      setError("");
-
       const [ordersResult, summaryResult] = await Promise.all([
         apiFetch<OrdersResponse>("/api/orders/my-orders"),
         apiFetch<SummaryResponse>("/api/orders/summary"),
@@ -121,6 +118,7 @@ export default function CustomerDashboard() {
 
       setOrders(ordersResult.data || []);
       setSummary(summaryResult.data || initialSummary);
+      setError("");
     } catch (error) {
       console.error("Customer dashboard error:", error);
 
@@ -133,6 +131,11 @@ export default function CustomerDashboard() {
       setLoading(false);
     }
   }, []);
+
+  const refreshDashboard = () => {
+    setLoading(true);
+    loadDashboard();
+  };
 
   useEffect(() => {
     loadDashboard();
@@ -203,7 +206,7 @@ export default function CustomerDashboard() {
         <p className="mt-2 text-sm text-red-600">{error}</p>
 
         <Button
-          onClick={loadDashboard}
+          onClick={refreshDashboard}
           className="mt-5 bg-orange-600 hover:bg-orange-700"
         >
           Try Again
@@ -232,7 +235,7 @@ export default function CustomerDashboard() {
         </div>
 
         <Button
-          onClick={loadDashboard}
+          onClick={refreshDashboard}
           disabled={loading}
           variant="outline"
           className="rounded-xl border-orange-200"

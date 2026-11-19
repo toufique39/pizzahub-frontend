@@ -208,7 +208,12 @@ export function FeaturedMenuSection({
                     <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
                       <MapPin size={15} className="shrink-0 text-orange-600" />
                       <span className="truncate">
-                        {item.location?.area}, {item.location?.city}
+                        {[
+                          item.location?.area || item.area,
+                          item.location?.city || item.city,
+                        ]
+                          .filter(Boolean)
+                          .join(", ") || "Location unavailable"}
                       </span>
                     </div>
 

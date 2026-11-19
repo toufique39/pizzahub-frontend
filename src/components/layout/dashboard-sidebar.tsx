@@ -19,13 +19,16 @@ export function DashboardSidebar({ title, items }: DashboardSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-full shrink-0 md:w-56">
+    <aside className="w-full shrink-0">
       <p className="px-2.5 pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
         {title}
       </p>
-      <nav className="flex gap-1 overflow-x-auto pb-1 md:flex-col md:overflow-visible">
+      <nav className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
         {items.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive =
+            pathname === item.href ||
+            (item.href !== items[0]?.href &&
+              pathname.startsWith(`${item.href}/`));
 
           return (
             <Link
@@ -33,9 +36,9 @@ export function DashboardSidebar({ title, items }: DashboardSidebarProps) {
               href={item.href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-muted",
+                "whitespace-nowrap rounded-md px-3 py-2 text-sm transition-colors hover:bg-orange-50 hover:text-orange-700",
                 isActive
-                  ? "bg-muted font-medium text-foreground"
+                  ? "bg-orange-50 font-semibold text-orange-700"
                   : "text-muted-foreground"
               )}
             >

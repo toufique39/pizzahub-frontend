@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
   SlidersHorizontal,
@@ -15,6 +16,7 @@ import {
 import type { MenuItem } from "../types/menu.types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 interface MenuResponse {
   success: boolean;
@@ -52,10 +54,12 @@ function getItemImage(item: MenuItem) {
 }
 
 export default function MenuBrowser() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [items, setItems] = useState<MenuItem[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
   const [area, setArea] = useState("");
   const [sort, setSort] = useState("latest");
@@ -67,28 +71,34 @@ export default function MenuBrowser() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Read category from homepage category links
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const selectedCategory = params.get("category");
+  // Category links from the homepage are reflected in the URL.
+  const category = searchParams.get("category") || "";
+  const debouncedCity = useDebouncedValue(city, 350);
+  const debouncedArea = useDebouncedValue(area, 350);
 
-    if (selectedCategory) {
-      setCategory(selectedCategory);
+  const updateCategory = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (value) {
+      params.set("category", value);
+    } else {
+      params.delete("category");
     }
-  }, []);
+
+    setLoading(true);
+    setPage(1);
+    router.replace(`/menu?${params.toString()}`, { scroll: false });
+  };
 
   const fetchMenuItems = useCallback(
     async (signal?: AbortSignal) => {
       try {
-        setLoading(true);
-        setError("");
-
         const params = new URLSearchParams();
 
         if (search.trim()) params.set("search", search.trim());
         if (category) params.set("category", category);
-        if (city.trim()) params.set("city", city.trim());
-        if (area.trim()) params.set("area", area.trim());
+        if (debouncedCity.trim()) params.set("city", debouncedCity.trim());
+        if (debouncedArea.trim()) params.set("area", debouncedArea.trim());
 
         params.set("sort", sort);
         params.set("page", String(page));
@@ -108,6 +118,7 @@ export default function MenuBrowser() {
         setItems(result.data || []);
         setTotalPages(result.pagination?.totalPages || 1);
         setTotalItems(result.pagination?.totalItems || 0);
+        setError("");
       } catch (err) {
         if (err instanceof Error && err.name === "AbortError") {
           return;
@@ -126,7 +137,7 @@ export default function MenuBrowser() {
         }
       }
     },
-    [search, category, city, area, sort, page]
+    [search, category, debouncedCity, debouncedArea, sort, page]
   );
 
   useEffect(() => {
@@ -139,20 +150,26 @@ export default function MenuBrowser() {
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
     setPage(1);
     setSearch(searchInput);
   };
 
   const clearFilters = () => {
+    setLoading(true);
     setSearchInput("");
     setSearch("");
-    setCategory("");
     setCity("");
     setArea("");
     setSort("latest");
     setPage(1);
 
-    window.history.replaceState(null, "", "/menu");
+    router.replace("/menu", { scroll: false });
+  };
+
+  const retry = () => {
+    setLoading(true);
+    fetchMenuItems();
   };
 
   return (
@@ -226,10 +243,7 @@ export default function MenuBrowser() {
 
               <select
                 value={category}
-                onChange={(event) => {
-                  setCategory(event.target.value);
-                  setPage(1);
-                }}
+                onChange={(event) => updateCategory(event.target.value)}
                 className="h-11 w-full rounded-lg border border-orange-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-orange-400"
               >
                 <option value="">All Categories</option>
@@ -286,6 +300,7 @@ export default function MenuBrowser() {
               <select
                 value={sort}
                 onChange={(event) => {
+                  setLoading(true);
                   setSort(event.target.value);
                   setPage(1);
                 }}
@@ -332,7 +347,7 @@ export default function MenuBrowser() {
             <p className="font-semibold text-red-600">{error}</p>
 
             <Button
-              onClick={() => fetchMenuItems()}
+              onClick={retry}
               className="mt-5 bg-orange-600 hover:bg-orange-700"
             >
               Try Again
@@ -415,7 +430,12 @@ export default function MenuBrowser() {
                   <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
                     <MapPin size={15} className="text-orange-600" />
 
-                    {item.location?.area}, {item.location?.city}
+                    {[
+                      item.location?.area || item.area,
+                      item.location?.city || item.city,
+                    ]
+                      .filter(Boolean)
+                      .join(", ") || "Location unavailable"}
                   </div>
 
                   <p className="mt-3 text-sm text-gray-600">
@@ -447,12 +467,15 @@ export default function MenuBrowser() {
 
         {/* Pagination */}
         {!loading && !error && totalItems > 0 && (
-          <div className="mt-12 flex items-center justify-center gap-5">
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-5">
 
             <Button
               variant="outline"
               disabled={page <= 1}
-              onClick={() => setPage((previous) => previous - 1)}
+              onClick={() => {
+                setLoading(true);
+                setPage((previous) => previous - 1);
+              }}
               className="rounded-full"
             >
               <ChevronLeft size={17} />
@@ -466,7 +489,10 @@ export default function MenuBrowser() {
             <Button
               variant="outline"
               disabled={page >= totalPages}
-              onClick={() => setPage((previous) => previous + 1)}
+              onClick={() => {
+                setLoading(true);
+                setPage((previous) => previous + 1);
+              }}
               className="rounded-full"
             >
               Next

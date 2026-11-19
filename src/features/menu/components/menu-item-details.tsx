@@ -201,8 +201,13 @@ export default function MenuItemDetails({
                 </p>
 
                 <p className="mt-2 flex items-center gap-2 text-sm text-gray-500">
-                  <MapPin size={16} className="text-orange-600" />
-                  {item.location.area}, {item.location.city}
+                  <MapPin size={16} className="shrink-0 text-orange-600" />
+                  {[
+                    item.location?.area || item.area,
+                    item.location?.city || item.city,
+                  ]
+                    .filter(Boolean)
+                    .join(", ") || "Location unavailable"}
                 </p>
               </div>
             </div>

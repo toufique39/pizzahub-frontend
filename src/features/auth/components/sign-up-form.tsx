@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
@@ -21,7 +21,7 @@ export default function SignUpForm() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -36,7 +36,11 @@ export default function SignUpForm() {
   });
 const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-const selectedRole = watch("role");
+const selectedRole = useWatch({
+  control,
+  name: "role",
+  defaultValue: "customer",
+});
 
 const handleGoogleSignUp = async () => {
   try {
