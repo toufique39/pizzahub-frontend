@@ -14,7 +14,6 @@ import {
   LogOut,
   Menu,
   X,
-  ChefHat,
 } from "lucide-react";
 
 import { signOut } from "@/lib/auth-client";
@@ -63,6 +62,8 @@ export default function VendorDashboardShell({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
+  const closeMobileMenu = () => setMobileOpen(false);
+
   const handleLogout = async () => {
     try {
       setLoggingOut(true);
@@ -76,20 +77,18 @@ export default function VendorDashboardShell({
 
   const sidebarContent = (
     <>
-      <Link
-        href="/vendor/dashboard"
-        onClick={() => setMobileOpen(false)}
-        className="flex items-center gap-3 border-b border-white/10 px-6 py-6"
-      >
-        <div className="rounded-xl bg-orange-500 p-2">
-          <ChefHat className="h-6 w-6 text-white" />
-        </div>
+     {/* Logo */}
+        <Link
+          href="/"
+          onClick={closeMobileMenu}
+          className="flex min-w-0 items-center gap-2"
+        >
+          <span className="text-2xl sm:text-3xl">🍕</span>
 
-        <div>
-          <h1 className="text-xl font-extrabold text-white">PizzaHub</h1>
-          <p className="text-xs text-orange-300">Vendor Panel</p>
-        </div>
-      </Link>
+          <span className="truncate text-xl font-extrabold tracking-tight text-yellow-50 sm:text-2xl">
+            Pizza<span className="text-orange-600">Hub</span>
+          </span>
+        </Link>
 
       <div className="px-4 py-6">
         <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
@@ -144,12 +143,17 @@ export default function VendorDashboardShell({
     <div className="min-h-screen bg-[#fffaf5]">
       {/* Mobile top navigation */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
+        
         <Link
-          href="/vendor/dashboard"
-          className="flex items-center gap-2 font-bold text-gray-900"
+          href="/"
+          onClick={closeMobileMenu}
+          className="flex min-w-0 items-center gap-2"
         >
-          <ChefHat className="h-6 w-6 text-orange-600" />
-          PizzaHub Vendor
+          <span className="text-2xl sm:text-3xl">🍕</span>
+
+          <span className="truncate text-xl font-extrabold tracking-tight text-[#321b16] sm:text-2xl">
+            Pizza<span className="text-orange-600">Hub</span>
+          </span>
         </Link>
 
         <button
