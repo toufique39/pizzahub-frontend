@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/server-auth";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import VendorDashboardShell from "@/components/layout/vendor-dashboard-shell";
 
 export const instant = false;
 
@@ -19,8 +20,9 @@ export default async function VendorDashboardLayout({
   await requireRole("vendor");
 
   return (
-    <DashboardShell title="Vendor Console" items={vendorNavItems}>
+        <VendorDashboardShell>
       {children}
-    </DashboardShell>
+        </VendorDashboardShell>
+
   );
 }
