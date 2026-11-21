@@ -1,6 +1,6 @@
 
 "use client";
-
+import AdminAnalyticsCharts from "@/features/admin/components/admin-analytics-charts";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -213,7 +213,8 @@ export default function AdminDashboardOverview() {
           })}
         </div>
       </section>
-
+   {/* Analytics and Charts */}
+<AdminAnalyticsCharts />
       {/* Quick actions */}
       <section>
         <div className="mb-4">

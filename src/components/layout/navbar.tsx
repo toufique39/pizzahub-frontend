@@ -15,6 +15,7 @@ import {
 
 import { authClient } from "@/lib/auth-client";
 import { getDashboardPath } from "@/utils/role-redirect";
+import Image from "next/image";
 
 
 const navLinks = [
@@ -122,6 +123,7 @@ export default function Navbar() {
                     src={user.image}
                     alt={user.name}
                     className="size-8 rounded-full object-cover"
+          
                   />
                 ) : (
                   <span className="flex size-8 items-center justify-center rounded-full bg-orange-100 text-orange-700">
