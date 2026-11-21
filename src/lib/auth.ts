@@ -84,8 +84,9 @@ export const auth = betterAuth({
   let requestedRole =
     typeof user.role === "string" ? user.role : "customer";
 
-  // Read selected role from Google OAuth state
-  if (ctx?.path === "/callback/:id") {
+  // Read selected role from Google OAuth state.
+  // Better Auth routes OAuth callbacks through `/callback/<provider>`.
+  if (typeof ctx?.path === "string" && ctx.path.startsWith("/callback/")) {
     const oauthData = await getOAuthState<{
       role?: string;
     }>();

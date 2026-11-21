@@ -31,18 +31,22 @@ export default function PaymentCancelPage() {
         </div>
 
         <div className="mt-7 grid gap-3">
-          <Button  className="bg-orange-600 hover:bg-orange-700">
-            <Link href="/vendor/dashboard/subscription">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Try Again
-            </Link>
+          <Button
+            render={<Link href="/vendor/dashboard/subscription" />}
+            nativeButton={false}
+            className="bg-orange-600 hover:bg-orange-700"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Try Again
           </Button>
 
-          <Button  variant="outline">
-            <Link href="/vendor/dashboard">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
-            </Link>
+          <Button
+            render={<Link href="/vendor/dashboard" />}
+            nativeButton={false}
+            variant="outline"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
           </Button>
         </div>
       </div>

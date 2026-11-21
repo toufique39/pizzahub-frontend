@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 
-import { PagePlaceholder } from "@/components/common/page-placeholder";
+import VendorOrders from "@/features/orders/components/vendor-orders";
 
 export const metadata: Metadata = {
   title: "Vendor orders",
 };
 
 export default function VendorOrdersPage() {
-  return (
-    <PagePlaceholder
-      title="Vendor orders"
-      description="Incoming orders and status transitions will be implemented in features/orders."
-    />
-  );
+  return <VendorOrders />;
 }

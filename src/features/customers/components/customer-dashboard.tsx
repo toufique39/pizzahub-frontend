@@ -138,7 +138,11 @@ export default function CustomerDashboard() {
   };
 
   useEffect(() => {
-    loadDashboard();
+    const timeoutId = window.setTimeout(() => {
+      void loadDashboard();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [loadDashboard]);
 
   // Cancel pending order

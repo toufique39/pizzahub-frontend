@@ -143,9 +143,14 @@ export default function MenuBrowser() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetchMenuItems(controller.signal);
+    const timeoutId = window.setTimeout(() => {
+      void fetchMenuItems(controller.signal);
+    }, 0);
 
-    return () => controller.abort();
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [fetchMenuItems]);
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {

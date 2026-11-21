@@ -137,7 +137,11 @@ export default function MyMenuItems() {
   };
 
   useEffect(() => {
-    loadItems();
+    const timeoutId = window.setTimeout(() => {
+      void loadItems();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [loadItems]);
 
   const startEditing = (item: MenuItem) => {

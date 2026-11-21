@@ -167,7 +167,11 @@ export default function VendorDashboard() {
   };
 
   useEffect(() => {
-    loadDashboard();
+    const timeoutId = window.setTimeout(() => {
+      void loadDashboard();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [loadDashboard]);
 
   const handleOrderAction = async (

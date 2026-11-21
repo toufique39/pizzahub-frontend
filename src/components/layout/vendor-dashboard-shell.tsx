@@ -36,7 +36,7 @@ const navigation = [
   },
   {
     label: "Customer Orders",
-    href: "/vendor/dashboard#customer-orders",
+    href: "/vendor/dashboard/orders",
     icon: ShoppingBag,
   },
   {
